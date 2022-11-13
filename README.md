@@ -25,6 +25,8 @@ the rhombic grid
 [[1]](#SchiffnerIUS2022) for
 coherent plane-wave compounding.
 
+![CIRS040](./figures/results.png)
+
 ## Coming soon... stay tuned!
 
 ## References :notebook:
