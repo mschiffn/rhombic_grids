@@ -60,7 +60,7 @@ function image = das_pw( positions, data_RF, f_s, theta_incident, element_width,
 % -------------------------------------------------------------------------
 %   author: Martin F. Schiffner
 %   date: 2022-11-13
-%   modified: 2022-11-13
+%   modified: 2022-11-14
 
 % print status
 time_start = tic;
@@ -95,8 +95,8 @@ if ~( isscalar( f_s ) && isreal( f_s ) && f_s > 0 )
 end
 
 % ensure positive real-valued scalar theta_incident
-if ~( isscalar( theta_incident ) && isreal( theta_incident ) && theta_incident > 0 && theta_incident < pi / 2 )
-    errorStruct.message = 'theta_incident must be scalar and range from 0 to pi / 2!';
+if ~( isscalar( theta_incident ) && isreal( theta_incident ) && theta_incident > - pi / 2 && theta_incident < pi / 2 )
+    errorStruct.message = 'theta_incident must be scalar and range from - pi / 2 to pi / 2!';
     errorStruct.identifier = 'das_pw:NoTwoColumnMatrix';
     error( errorStruct );
 end
@@ -146,13 +146,13 @@ positions_lbs_x = positions_ctr_x - element_width_over_two;
 positions_ubs_x = positions_ctr_x + element_width_over_two;
 
 % propagation direction
-e_theta_x = cos( theta_incident );
-e_theta_z = sin( theta_incident );
+e_theta_x = sin( theta_incident );
+e_theta_z = cos( theta_incident );
 
 % reference position
 position_ctr_x_ref = sign( e_theta_x ) * positions_ctr_x( 1 );
 
-% lateral distances [ N_pos_x, N_elements ]
+% lateral distances [ N_pos, N_elements ]
 dist_lateral = positions_ctr_x - positions( :, 1 );
 indicator_lower = dist_lateral < 0;
 
@@ -189,7 +189,7 @@ axis_omega_bp = 2 * pi * axis_f_bp;
 % 4.) frequency-dependent F-number
 %--------------------------------------------------------------------------
 % maximum F-numbers for each axial position
-F_ub = sqrt( axis_f_bp .* positions( :, 2 ).' / ( 2.88 * c_avg ) );
+% F_ub = sqrt( axis_f_bp .* positions( :, 2 ).' / ( 2.88 * c_avg ) );
 
 %--------------------------------------------------------------------------
 % 5.) electronic focusing
@@ -216,12 +216,25 @@ for index_pos = 1:size( positions, 1 )
     % a) determine actual receive aperture
     %----------------------------------------------------------------------
     % map desired bounds of the receive aperture to element indices
-    indices_aperture_lb = max( ceil( M_elements + ( positions( index_pos, 1 ) - width_aperture_over_two_desired( :, index_pos ) ) / element_pitch ) + 1, 1 );
-    indices_aperture_ub = min( floor( M_elements + ( positions( index_pos, 1 ) + width_aperture_over_two_desired( :, index_pos ) ) / element_pitch ) + 1, N_elements );
+    index_aperture_lb = max( ceil( M_elements + ( positions( index_pos, 1 ) - width_aperture_over_two_desired( :, index_pos ) ) / element_pitch ) + 1, 1 );
+    index_aperture_ub = min( floor( M_elements + ( positions( index_pos, 1 ) + width_aperture_over_two_desired( :, index_pos ) ) / element_pitch ) + 1, N_elements );
+
+    % no aperture
+    if index_aperture_ub < 1 || index_aperture_lb > N_elements
+
+        % erase progress in percent
+        if mod( index_pos, 200 ) || index_pos == size( positions, 1 )
+            fprintf( '\b\b\b\b\b\b\b' );
+        end
+
+        % skip calculations
+        continue;
+
+    end % if index_aperture_ub < 1 || index_aperture_lb > N_elements
 
     % actual width of the receive aperture
-    width_aperture_lower_over_two = positions( index_pos, 1 ) - positions_lbs_x( indices_aperture_lb ).';
-    width_aperture_upper_over_two = positions_ubs_x( indices_aperture_ub ).' - positions( index_pos, 1 );
+    width_aperture_lower_over_two = positions( index_pos, 1 ) - positions_lbs_x( index_aperture_lb ).';
+    width_aperture_upper_over_two = positions_ubs_x( index_aperture_ub ).' - positions( index_pos, 1 );
 
     %----------------------------------------------------------------------
     % b) compute phase shifts
