@@ -29,6 +29,44 @@ coherent plane-wave compounding.
 
 ## Coming soon... stay tuned!
 
+## Getting Started
+
+1. Clone the repository or download the release to your local hard drive.
+
+```
+git clone https://github.com/mschiffn/rhombic_grids
+```
+
+2. Add the repository to your MATLAB path using .
+
+```matlab
+addpath( genpath( './rhombic_grids' ) )
+```
+
+## Folder Structure
+
+The repository has the following structure:
+
+    .
+    ├── +auxiliary      # auxiliary functions (e.g., dimension and size check)
+    ├── +illustration   # illustration functions (e.g., logarithmic compression)
+    ├── +windows        # classes for various window functions (e.g., boxcar, Hann, Tukey)
+    ├── das_pw.m        # delay-and-sum (DAS) algorithm for arbitrary grids
+    ├── data_RF.mat     # measurement data from tissue phantom
+    ├── example.m       # main script
+    ├── LICENSE         # license file
+    └── README.md       # this readme
+
+The package +windows contains
+an exemplary class hierarchy to manage
+various types of
+window functions.
+
+## Image Formation
+
+The script example.m shows the workflow to reproduce the results in
+[[1]](#SchiffnerIUS2022).
+
 ## References :notebook:
 
 1. <a name="SchiffnerIUS2022"></a>
