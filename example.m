@@ -76,13 +76,15 @@ fprintf( 'k_hat_z_ub: %.1f\n', k_hat_z_ub );
 % a) independent parameters
 grid_orthogonal_usual.delta_x = element_pitch / 4;
 grid_orthogonal_usual.delta_z = grid_orthogonal_usual.delta_x;
-grid_orthogonal_usual.N_x = 512;
-grid_orthogonal_usual.N_z = 512;
 
 % b) dependent parameters
-grid_orthogonal_usual.M_x = ( grid_orthogonal_usual.N_x - 1 ) / 2;
-grid_orthogonal_usual.positions_x = (-grid_orthogonal_usual.M_x:grid_orthogonal_usual.M_x) * grid_orthogonal_usual.delta_x;
-grid_orthogonal_usual.positions_z = (1:grid_orthogonal_usual.N_z) * grid_orthogonal_usual.delta_z;
+grid_orthogonal_usual.N_x = floor( diff( FOV_x ) / grid_orthogonal_usual.delta_x );
+grid_orthogonal_usual.N_z = floor( diff( FOV_z ) / grid_orthogonal_usual.delta_z );
+grid_orthogonal_usual.volume = grid_orthogonal_usual.delta_x * grid_orthogonal_usual.delta_z;
+grid_orthogonal_usual.offset_x = FOV_x( 1 ) + ( diff( FOV_x ) - ( grid_orthogonal_usual.N_x - 1 ) * grid_orthogonal_usual.delta_x ) / 2;
+grid_orthogonal_usual.offset_z = FOV_z( 1 ) + ( diff( FOV_z ) - ( grid_orthogonal_usual.N_z - 1 ) * grid_orthogonal_usual.delta_z ) / 2;
+grid_orthogonal_usual.positions_x = grid_orthogonal_usual.offset_x + (0:( grid_orthogonal_usual.N_x - 1 )) * grid_orthogonal_usual.delta_x;
+grid_orthogonal_usual.positions_z = grid_orthogonal_usual.offset_z + (0:( grid_orthogonal_usual.N_z - 1 )) * grid_orthogonal_usual.delta_z;
 [ grid_orthogonal_usual.X, grid_orthogonal_usual.Z ] = meshgrid( grid_orthogonal_usual.positions_x, grid_orthogonal_usual.positions_z );
 
 grid_orthogonal_usual.positions = [ grid_orthogonal_usual.X( : ), grid_orthogonal_usual.Z( : ) ];
@@ -93,10 +95,10 @@ grid_orthogonal_usual.positions = [ grid_orthogonal_usual.X( : ), grid_orthogona
 % a) independent parameters
 grid_orthogonal_optimal.delta_x = 2 * pi / ( k_hat_x_ub - k_hat_x_lb );
 grid_orthogonal_optimal.delta_z = 2 * pi / ( k_hat_z_ub - k_hat_z_lb );
-grid_orthogonal_optimal.N_x = floor( diff( FOV_x ) / grid_orthogonal_optimal.delta_x );
-grid_orthogonal_optimal.N_z = floor( diff( FOV_z ) / grid_orthogonal_optimal.delta_z );
 
 % b) dependent parameters
+grid_orthogonal_optimal.N_x = floor( diff( FOV_x ) / grid_orthogonal_optimal.delta_x );
+grid_orthogonal_optimal.N_z = floor( diff( FOV_z ) / grid_orthogonal_optimal.delta_z );
 grid_orthogonal_optimal.volume = grid_orthogonal_optimal.delta_x * grid_orthogonal_optimal.delta_z;
 grid_orthogonal_optimal.offset_x = FOV_x( 1 ) + ( diff( FOV_x ) - ( grid_orthogonal_optimal.N_x - 1 ) * grid_orthogonal_optimal.delta_x ) / 2;
 grid_orthogonal_optimal.offset_z = FOV_z( 1 ) + ( diff( FOV_z ) - ( grid_orthogonal_optimal.N_z - 1 ) * grid_orthogonal_optimal.delta_z ) / 2;
@@ -199,6 +201,8 @@ index_t0 = 16;
 
 % specify cell array for B-mode images
 images_single = cell( numel( grids ), numel( theta_incident ) );
+times_elapsed = zeros( numel( grids ), numel( theta_incident ) );
+
 images_cpwc = cell( numel( grids ), 1 );
 
 % iterate grids
@@ -208,7 +212,7 @@ for index_grid = 1:numel( grids )
     for index_theta = 1:numel( theta_incident )
 
         % call delay-and-sum (DAS) algorithm
-        images_single{ index_grid, index_theta } = das_pw( grids{ index_grid }.positions, data_RF( :, :, index_theta ), f_s, theta_incident( index_theta ), element_width, element_pitch, c_avg, f_bounds, index_t0, [], F_number );
+        [ images_single{ index_grid, index_theta }, times_elapsed( index_grid, index_theta ) ] = das_pw( grids{ index_grid }.positions, data_RF( :, :, index_theta ), f_s, theta_incident( index_theta ), element_width, element_pitch, c_avg, f_bounds, index_t0, [], F_number );
 
     end % for index_theta = 1:numel( theta_incident )
 

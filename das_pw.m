@@ -1,4 +1,4 @@
-function image = das_pw( positions, data_RF, f_s, theta_incident, element_width, element_pitch, c_avg, f_bounds, index_t0, window, F_number )
+function [ image, time_elapsed ] = das_pw( positions, data_RF, f_s, theta_incident, element_width, element_pitch, c_avg, f_bounds, index_t0, window, F_number )
 % DAS_PW Delay-And-Sum (DAS) Beamforming [ Fourier domain, steered plane wave ]
 %
 % Computes a B-mode image using
@@ -299,4 +299,4 @@ end % for index_pos = 1:size( positions, 1 )
 time_elapsed = toc( time_start );
 fprintf( 'done! (%f s)\n', time_elapsed );
 
-end % function image = das_pw( positions, data_RF, f_s, theta_incident, element_width, element_pitch, c_avg, f_bounds, index_t0, window, F_number )
+end % function [ image, time_elapsed ] = das_pw( positions, data_RF, f_s, theta_incident, element_width, element_pitch, c_avg, f_bounds, index_t0, window, F_number )
