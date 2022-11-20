@@ -27,8 +27,6 @@ coherent plane-wave compounding.
 
 ![CIRS040](./figures/results.png)
 
-## Coming soon... stay tuned!
-
 ## Getting Started
 
 1. Clone the repository or download the release to your local hard drive.

@@ -8,7 +8,7 @@
 %
 % author: Martin F. Schiffner
 % date: 2022-11-13
-% modified: 2022-11-16
+% modified: 2022-11-20
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% clear workspace
@@ -136,7 +136,7 @@ B = 2 * pi * eye( 2 );
 U = A \ B;
 
 U_norm = vecnorm( U );
-grid_rhombic.volume_rhombic = abs( det( U ) );
+grid_rhombic.volume = abs( det( U ) );
 
 grid_rhombic.N_1 = floor( diff( FOV_x ) / U( 1, 1 ) );
 grid_rhombic.N_2 = floor( diff( FOV_z ) / U( 2, 2 ) );
@@ -279,7 +279,18 @@ title( 'Interpolation kernel (x-space)' );
 colormap gray;
 
 %--------------------------------------------------------------------------
-% 2.) optimal orthogonal grid
+% 2.) usual orthogonal grid
+%--------------------------------------------------------------------------
+% a) samples
+samples_usual = grid_orthogonal_usual.volume * reshape( images_cpwc{ 1 }, [ grid_orthogonal_usual.N_z, grid_orthogonal_usual.N_x ] );
+samples_usual_dB = 20 * log10( abs( samples_usual ) / max( abs( samples_usual( : ) ) ) );
+
+% b) spectrum
+samples_usual_dft = fftshift( fft2( samples_usual ), 2 );
+samples_usual_dft_dB = illustration.dB( samples_usual_dft, 20 );
+
+%--------------------------------------------------------------------------
+% 3.) optimal orthogonal grid
 %--------------------------------------------------------------------------
 % a) samples (coarse)
 samples_optimal = reshape( images_cpwc{ 2 }, [ grid_orthogonal_optimal.N_z, grid_orthogonal_optimal.N_x ] );
@@ -289,31 +300,85 @@ samples_optimal_dB = 20 * log10( abs( samples_optimal ) / max( abs( samples_opti
 samples_optimal_dft = grid_orthogonal_optimal.volume * dft_positions( images_cpwc{ 2 }, grids{ 2 }.positions, axis_k_x, axis_k_z );
 
 % apply phase shift
-samples_optimal_dft = samples_optimal_dft .* exp( 1j * axis_k_x * offset_x_usual ) .* exp( 1j * axis_k_z.' * offset_z_usual );
+samples_optimal_dft = samples_optimal_dft .* exp( 1j * axis_k_x * grid_orthogonal_usual.offset_x ) .* exp( 1j * axis_k_z.' * grid_orthogonal_usual.offset_z );
 samples_optimal_dft_dB = illustration.dB( samples_optimal_dft, 20 );
 
 % c) samples (fine)
 samples_optimal_interp = ifft2( ifftshift( samples_optimal_dft .* filter_dft_compound, 2 ) );
-samples_optimal_interp = samples_optimal_interp( 1:N_voxels_z_usual, 1:N_voxels_x_usual );
+samples_optimal_interp = samples_optimal_interp( 1:grid_orthogonal_usual.N_z, 1:grid_orthogonal_usual.N_x );
 samples_optimal_interp_dB = illustration.dB( samples_optimal_interp, 20 );
 
 %--------------------------------------------------------------------------
-% 2.) rhombic grid
+% 4.) rhombic grid
 %--------------------------------------------------------------------------
 % a) spectrum
-samples_rhombic_dft = grid_rhombic.volume_rhombic * dft_positions( images_cpwc{ 3 }, grid_rhombic.positions, axis_k_x, axis_k_z );
+samples_rhombic_dft = grid_rhombic.volume * dft_positions( images_cpwc{ 3 }, grid_rhombic.positions, axis_k_x, axis_k_z );
 
 % apply phase shift
-samples_rhombic_dft = samples_rhombic_dft .* exp( 1j * axis_k_x * offset_x_usual ) .* exp( 1j * axis_k_z.' * offset_z_usual );
+samples_rhombic_dft = samples_rhombic_dft .* exp( 1j * axis_k_x * grid_orthogonal_usual.offset_x ) .* exp( 1j * axis_k_z.' * grid_orthogonal_usual.offset_z );
 
 % logarithmic compression
 samples_rhombic_dft_dB = illustration.dB( samples_rhombic_dft, 20 );
 
 % b) samples (fine)
 samples_rhombic_interp = ifft2( ifftshift( samples_rhombic_dft .* filter_dft_compound, 2 ) );
-samples_rhombic_interp = samples_rhombic_interp( 1:N_voxels_z_usual, 1:N_voxels_x_usual );
+samples_rhombic_interp = samples_rhombic_interp( 1:grid_orthogonal_usual.N_z, 1:grid_orthogonal_usual.N_x );
 samples_rhombic_interp_dB = illustration.dB( samples_rhombic_interp, 20 );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% compute errors and show results
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%--------------------------------------------------------------------------
+% 1.) metrics
+%--------------------------------------------------------------------------
+error_orthogonal_optimal = samples_usual - samples_optimal_interp;
+error_orthogonal_optimal_dB = 20 * log10( abs( error_orthogonal_optimal ) / max( abs( samples_usual( : ) ) ) );
+
+error_rhombic = samples_usual - samples_rhombic_interp;
+error_rhombic_dB = 20 * log10( abs( error_rhombic ) / max( abs( samples_usual( : ) ) ) );
+
+rel_RMSE_orthogonal_optimal = norm( error_orthogonal_optimal( : ) ) / norm( samples_usual( : ) );
+rel_RMSE_rhombic = norm( error_rhombic( : ) ) / norm( samples_usual( : ) );
+
+fprintf( 'Rel. RMSE (optimal vs. usual): %.10f %% (%.1f %%)\n', rel_RMSE_orthogonal_optimal * 1e2, rel_RMSE_orthogonal_optimal * 1e2 );
+fprintf( 'Rel. RMSE (rhombic vs. usual): %.10f %% (%.1f %%)\n', rel_RMSE_rhombic * 1e2, rel_RMSE_rhombic * 1e2 );
+
+% SSIM_orthogonal_usual = ssim( samples_orthogonal_fine_dB, samples_orthogonal_fine_interp_dB );
+SSIM_orthogonal_optimal = ssim( samples_optimal_interp_dB, samples_usual_dB );
+SSIM_rhombic = ssim( samples_rhombic_interp_dB, samples_usual_dB );
+
+fprintf( 'Mean SSIM Index (optimal vs. usual): %.10f %% (%.1f %%)\n', SSIM_orthogonal_optimal * 1e2, SSIM_orthogonal_optimal * 1e2 );
+fprintf( 'Mean SSIM Index (rhombic vs. usual): %.10f %% (%.1f %%)\n', SSIM_rhombic * 1e2, SSIM_rhombic * 1e2 );
+
+c_limits = [-60,0];
+
+%--------------------------------------------------------------------------
+% 2.) show results
+%--------------------------------------------------------------------------
+figure( 1 );
+subplot( 4, 3, 2 );
+imagesc( grid_orthogonal_optimal.positions_x, grid_orthogonal_optimal.positions_z, samples_optimal_dB, c_limits );
+subplot( 4, 3, 4 );
+imagesc( axis_k_x, axis_k_z, samples_usual_dft_dB, c_limits );
+subplot( 4, 3, 5 );
+imagesc( axis_k_x, axis_k_z, samples_optimal_dft_dB, c_limits );
+subplot( 4, 3, 6 );
+imagesc( axis_k_x, axis_k_z, samples_rhombic_dft_dB, c_limits );
+subplot( 4, 3, 7 );
+imagesc( grid_orthogonal_usual.positions_x, grid_orthogonal_usual.positions_z, samples_usual_dB, c_limits );
+subplot( 4, 3, 8 );
+imagesc( grid_orthogonal_usual.positions_x, grid_orthogonal_usual.positions_z, samples_optimal_interp_dB, c_limits );
+title( sprintf( 'mean SSIM index: %.2f %%', SSIM_orthogonal_optimal * 1e2 ) );
+subplot( 4, 3, 9 );
+imagesc( grid_orthogonal_usual.positions_x, grid_orthogonal_usual.positions_z, samples_rhombic_interp_dB, c_limits );
+title( sprintf( 'mean SSIM index: %.2f %%', SSIM_rhombic * 1e2 ) );
+% subplot( 4, 3, 10 );
+% imagesc( positions_x, positions_z, error_orthogonal_fine_dB, c_limits );
+subplot( 4, 3, 11 );
+imagesc( grid_orthogonal_usual.positions_x, grid_orthogonal_usual.positions_z, error_orthogonal_optimal_dB, c_limits );
+title( sprintf( 'rel. RMSE: %.2f %%', rel_RMSE_orthogonal_optimal * 1e2 ) );
+subplot( 4, 3, 12 );
+imagesc( grid_orthogonal_usual.positions_x, grid_orthogonal_usual.positions_z, error_rhombic_dB, c_limits );
+title( sprintf( 'rel. RMSE: %.2f %%', rel_RMSE_rhombic * 1e2 ) );
+colormap gray;

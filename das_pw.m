@@ -60,7 +60,7 @@ function [ image, time_elapsed ] = das_pw( positions, data_RF, f_s, theta_incide
 % -------------------------------------------------------------------------
 %   author: Martin F. Schiffner
 %   date: 2022-11-13
-%   modified: 2022-11-14
+%   modified: 2022-11-20
 
 % print status
 time_start = tic;
