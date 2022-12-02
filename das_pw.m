@@ -51,7 +51,7 @@ function [ image, time_elapsed ] = das_pw( positions, data_RF, f_s, theta_incide
 %
 %   [2] M. F. Schiffner, "Rhombic grids reduce the number of voxels in fast pulse-echo ultrasound imaging,"
 %       2022 IEEE Int. Ultrasonics Symp. (IUS), Venice, Italy, Oct. 2022, pp. 1–4.
-%       DOI: in press
+%       DOI: https://doi.org/10.1109/IUS54386.2022.9958278
 %       arXiv: https://arxiv.org/abs/2210.04818
 %       YouTube: https://www.youtube.com/watch?v=T6dkazW5ZuM
 %

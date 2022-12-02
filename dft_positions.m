@@ -1,5 +1,5 @@
 function result = dft_positions( samples, positions, axis_k_x, axis_k_z )
-%DFT_POSITIONS Summary of this function goes here
+%DFT_POSITIONS Compute discrete Fourier transform for arbitrary grids
 %
 % -------------------------------------------------------------------------
 % INPUTS:
@@ -17,18 +17,18 @@ function result = dft_positions( samples, positions, axis_k_x, axis_k_z )
 % -------------------------------------------------------------------------
 % REFERENCES:
 % -------------------------------------------------------------------------
-%   [1] M. F. Schiffner, "Rhombic Grids Reduce the Number of Voxels in Fast Pulse-Echo Ultrasound Imaging,"
+%   [1] M. F. Schiffner, "Rhombic grids reduce the number of voxels in fast pulse-echo ultrasound imaging,"
 %       2022 IEEE Int. Ultrasonics Symp. (IUS), Venice, Italy, Oct. 2022, pp. 1–4.
-%       DOI: https://doi.org/
-%       arxiv: https://arxiv.org/
-%       YouTube: https://www.youtube.com/watch?v=
+%       DOI: https://doi.org/10.1109/IUS54386.2022.9958278
+%       arXiv: https://arxiv.org/abs/2210.04818
+%       YouTube: https://www.youtube.com/watch?v=T6dkazW5ZuM
 %
 % -------------------------------------------------------------------------
 % ABOUT:
 % -------------------------------------------------------------------------
 %   author: Martin F. Schiffner
 %   date: 2022-09-13
-%   modified: 2022-09-14
+%   modified: 2022-12-02
 
 % phase shift
 axis_k_x_times_x = positions( :, 1 ) .* axis_k_x;

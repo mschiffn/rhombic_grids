@@ -41,6 +41,8 @@ git clone https://github.com/mschiffn/rhombic_grids
 addpath( genpath( './rhombic_grids' ) )
 ```
 
+3. Run the script example.m
+
 ## Folder Structure
 
 The repository has the following structure:
@@ -71,5 +73,7 @@ The script example.m shows the workflow to reproduce the results in
 M. F. Schiffner,
 "Rhombic grids reduce the number of voxels in fast pulse-echo ultrasound imaging,"
 2022 IEEE Int. Ultrasonics Symp. (IUS), Venice, Italy, Oct. 2022, pp. 1–4.
+[![DOI:10.1109/IUS54386.2022.9958278](https://img.shields.io/badge/DOI-10.1109%2FIUS54386.2022.9958278-blue)](https://doi.org/10.1109/IUS54386.2022.9958278)
 [![arXiv](https://img.shields.io/badge/arXiv-2210.04818-b31b1b.svg)](https://arxiv.org/abs/2210.04818)
 [![Watch on YouTube](https://img.shields.io/youtube/views/T6dkazW5ZuM?label=YouTube)](https://www.youtube.com/watch?v=T6dkazW5ZuM)
+

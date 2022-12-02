@@ -1,14 +1,23 @@
-% plot results for paper
-% experimental validation
+% compute results for paper [1]
 %
 % images
-% widths and FEHMs of wires
+% relative RMSEs and mean structural SSIMs
 %
-% influence of the F-number
+% -------------------------------------------------------------------------
+% REFERENCES:
+% -------------------------------------------------------------------------
+%   [1] M. F. Schiffner, "Rhombic grids reduce the number of voxels in fast pulse-echo ultrasound imaging,"
+%       2022 IEEE Int. Ultrasonics Symp. (IUS), Venice, Italy, Oct. 2022, pp. 1–4.
+%       DOI: https://doi.org/10.1109/IUS54386.2022.9958278
+%       arXiv: https://arxiv.org/abs/2210.04818
+%       YouTube: https://www.youtube.com/watch?v=T6dkazW5ZuM
 %
-% author: Martin F. Schiffner
-% date: 2022-11-13
-% modified: 2022-11-20
+% -------------------------------------------------------------------------
+% ABOUT:
+% -------------------------------------------------------------------------
+%   author: Martin F. Schiffner
+%   date: 2022-11-13
+%   modified: 2022-12-02
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% clear workspace
