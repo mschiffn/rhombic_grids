@@ -35,7 +35,7 @@ coherent plane-wave compounding.
 git clone https://github.com/mschiffn/rhombic_grids
 ```
 
-2. Add the repository to your MATLAB path using .
+2. Add the repository to your MATLAB path using
 
 ```matlab
 addpath( genpath( './rhombic_grids' ) )
