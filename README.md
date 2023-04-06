@@ -28,7 +28,7 @@ coherent plane-wave compounding.
 
 ![CIRS040](./figures/results.png)
 
-## Getting Started
+## :gear: Getting Started
 
 1. Clone the repository or download the release to your local hard drive.
 
@@ -68,7 +68,7 @@ window functions.
 The script example.m shows the workflow to reproduce the results in
 [[1]](#SchiffnerIUS2022).
 
-## References :notebook:
+## :notebook: References
 
 1. <a name="SchiffnerIUS2022"></a>
 M. F. Schiffner,
